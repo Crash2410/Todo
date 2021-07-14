@@ -1,4 +1,6 @@
 import React from 'react';
+import nextId from "react-id-generator";
+
 import AppHeader from '../app-header/app-header';
 import PostAddForm from '../post-add-form/post-add-form';
 import PostList from '../post-list/post-list';
@@ -13,29 +15,28 @@ const AppBlock = styled.div`
 `
 
 export default class App extends React.Component {
-    constructor(props){
-        super(props);
-
-        this.maxId = 4;
-    }
-
     state = {
         data: [{
             label: "Going  to learn React",
             important: true,
-            id: 1
+            id: '0wi0hi759'
         },
         {
             label: "That is so good",
             important: false,
-            id: 2
+            id: '4tflz8dyh'
         },
         {
             label: "I need a break...",
             important: false,
-            id: 3
+            id: 'j4y8sl7mc'
         }]
     };
+
+    // Генерация уникальных ID
+    generateID = () => {
+        return Math.random().toString(36).substr(2, 9);
+    }
     // Удаление элемента со списка
     onDeleteItem = (id) => {
         this.setState(({ data }) => {
@@ -56,7 +57,7 @@ export default class App extends React.Component {
         const newPost = {
             label: body,
             important: false,
-            id: this.maxId++
+            id: this.generateID()
         }
         this.setState(({ data }) => {
             const newArray = [...data, newPost];
@@ -69,7 +70,7 @@ export default class App extends React.Component {
 
     render() {
         const { data } = this.state;
-
+        console.log(data)
         return (
             <AppBlock>
                 <AppHeader />
