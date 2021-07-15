@@ -1,5 +1,4 @@
 import React from 'react';
-import nextId from "react-id-generator";
 
 import AppHeader from '../app-header/app-header';
 import PostAddForm from '../post-add-form/post-add-form';
@@ -19,18 +18,23 @@ export default class App extends React.Component {
         data: [{
             label: "Going  to learn React",
             important: true,
+            like: false,
             id: '0wi0hi759'
         },
         {
             label: "That is so good",
             important: false,
+            like: false,
             id: '4tflz8dyh'
         },
         {
             label: "I need a break...",
             important: false,
+            like: false,
             id: 'j4y8sl7mc'
-        }]
+        }],
+        term: "",
+        filter: "all"
     };
 
     // Генерация уникальных ID
@@ -67,20 +71,91 @@ export default class App extends React.Component {
             }
         })
     }
+    // Пометка "Избранный пост"
+    onToggleImportant = (id) => {
+        this.setState(({ data }) => {
+            return this.onToggle(data, "important", id);
+        })
+    }
+    // Пометка "Понравившегося поста"
+    onToggleLiked = (id) => {
+        this.setState(({ data }) => {
+            return this.onToggle(data, "like", id);
+        })
+    }
+    // Изменение параметров для 'Пометок' в State
+    onToggle = (data, param, id) => {
+        const index = data.findIndex(elem => elem.id === id);
+
+        const old = data[index];
+        const newItem = { ...old, [param]: !old[param] };
+
+        const newArray = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
+
+        return {
+            data: newArray
+        }
+    }
+    // Поиск постов
+    searchPost(items, term) {
+        if (term.length === 0) {
+            return items;
+        }
+
+        return items.filter((item) => {
+            return item.label.indexOf(term) > -1;
+        })
+    }
+
+    filterPost = (items, filter) => {
+        if (filter === 'like') {
+            return items.filter(item => item.like);
+        } else {
+            return items;
+        }
+    }
+
+    onUpdateSearch = (term) => {
+        this.setState({
+            term
+        })
+    }
+
+    onFilterSelect = (filter) => {
+        this.setState({
+            filter
+        })
+    }
 
     render() {
-        const { data } = this.state;
-        console.log(data)
+
+        const { data, term, filter } = this.state;
+
+        const liked = data.filter(item => item.like).length;
+        const allPosts = data.length;
+
+        const visiblePosts = this.filterPost(this.searchPost(data, term), filter);
+
         return (
             <AppBlock>
-                <AppHeader />
+                <AppHeader
+                    liked={liked}
+                    allPosts={allPosts}
+                />
                 <div className="search-panel d-flex">
-                    <SearchPanel />
-                    <PostStatusFilter />
+                    <SearchPanel
+                        onUpdateSearch={this.onUpdateSearch}
+                    />
+                    <PostStatusFilter 
+                        filter={filter}
+                        onFilterSelect={this.onFilterSelect}
+                    />
                 </div>
                 <PostList
-                    data={data}
+                    data={visiblePosts}
                     onDelete={this.onDeleteItem}
+                    onToggleImportant={this.onToggleImportant}
+                    onToggleLiked={this.onToggleLiked}
                 />
                 <PostAddForm onAddPost={this.onAddPost} />
             </AppBlock>
