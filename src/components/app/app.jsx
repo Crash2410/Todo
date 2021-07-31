@@ -58,6 +58,9 @@ export default class App extends React.Component {
     }
     // Добавление элемента на страницу
     onAddPost = (body) => {
+        if(body === ''){
+            return alert('Напишите свою запись в поле ввода.')
+        }
         const newPost = {
             label: body,
             important: false,
